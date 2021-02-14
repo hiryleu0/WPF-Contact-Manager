@@ -1,0 +1,274 @@
+﻿<Window x:Class="WPF16.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF16"
+        mc:Ignorable="d"
+        Title="Contact Manager" Height="600" Width="800" MinHeight="500" MinWidth="500" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:Converter1 x:Key="indexConverter"/>
+        <local:Converter2 x:Key="picConverter"/>
+        <local:MultiConverter x:Key="multiConverter"/>
+        <local:Converter3 x:Key="dataConverter"/>
+        <local:IgnoreNewItemPlaceholderConverter x:Key="filterConverte"/>
+        <local:Converter5 x:Key="visibleConverter"/>
+        <local:Converter6 x:Key="setConverter"/>
+
+        <CollectionViewSource Source="{Binding People}" x:Key="ViewSource"/>
+
+        <ContextMenu x:Key="contextMenu" StaysOpen="True">
+            <MenuItem Header="Delete" Click="MenuItem_Click_6" />
+        </ContextMenu>
+
+        <Style TargetType="ListBoxItem">
+            <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
+            <Setter Property="Focusable" Value="True"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="False">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem" x:Name="temp">
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="{Binding Path=Brush}"/>
+                                    </Trigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="False"/>
+                                            <Condition Property="ListBox.AlternationIndex" Value="0"/>
+                                        </MultiTrigger.Conditions>
+                                        <MultiTrigger.Setters>
+                                            <Setter Property="Background" Value="LightBlue"/>
+                                        </MultiTrigger.Setters>
+                                    </MultiTrigger>
+                                    <MultiTrigger>
+                                        <MultiTrigger.Conditions>
+                                            <Condition Property="IsSelected" Value="False"/>
+                                            <Condition Property="ListBox.AlternationIndex" Value="1"/>
+                                        </MultiTrigger.Conditions>
+                                        <MultiTrigger.Setters>
+                                            <Setter Property="Background" Value="BlueViolet"/>
+                                        </MultiTrigger.Setters>
+                                    </MultiTrigger>
+
+                                </ControlTemplate.Triggers>
+                                <DockPanel Background="{TemplateBinding Background}">
+                                    <Grid DockPanel.Dock="Top" Width="{Binding ElementName=list, Path=ActualWidth}" Margin="0"  >
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="80"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="60"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Margin="5 0 0 0" FontSize="20" FontWeight="DemiBold"
+                                               VerticalAlignment="Center">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0} {1}">
+                                                    <Binding Path="Name" />
+                                                    <Binding Path="Surname" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+
+                                        <Image Grid.Column="1" Source="{Binding Path=Gender,Converter={StaticResource picConverter}}" Margin="0 2 30 2"/>
+                                    </Grid>
+
+                                </DockPanel>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="LightYellow"/>
+                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsSelected" Value="False"/>
+                                        <Condition Property="ListBox.AlternationIndex" Value="0"/>
+                                    </MultiTrigger.Conditions>
+                                    <MultiTrigger.Setters>
+                                        <Setter Property="Background" Value="LightBlue"/>
+                                    </MultiTrigger.Setters>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsSelected" Value="False"/>
+                                        <Condition Property="ListBox.AlternationIndex" Value="1"/>
+                                    </MultiTrigger.Conditions>
+                                    <MultiTrigger.Setters>
+                                        <Setter Property="Background" Value="BlueViolet"/>
+                                    </MultiTrigger.Setters>
+                                </MultiTrigger>
+
+                            </ControlTemplate.Triggers>
+                            <DockPanel Background="{TemplateBinding Background}">
+                                <Grid DockPanel.Dock="Top" Width="{Binding ElementName=list, Path=ActualWidth}" Margin="0"  >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="60"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Margin="5 0 0 0" FontSize="20" FontWeight="DemiBold"
+                                               VerticalAlignment="Center">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}{0} {1}">
+                                                <Binding Path="Name" />
+                                                <Binding Path="Surname" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+
+                                    <Image Grid.Column="1" Source="{Binding Path=Gender,Converter={StaticResource picConverter}}" Margin="0 2 30 2"/>
+                                </Grid>
+                                <Grid  Margin="0">
+                                    <Grid.Visibility>
+                                        <MultiBinding Converter="{StaticResource visibleConverter}">
+                                            <Binding ElementName="list" Path="SelectedItem"/>
+                                            <Binding/>
+                                        </MultiBinding>
+                                    </Grid.Visibility>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock FontWeight="Bold" Padding="3">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="Email: {0}">
+                                                <Binding Path="Email"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="1" FontWeight="Bold" Padding="3">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="Phone: {0}">
+                                                <Binding Path="Phone"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </Grid>
+                            </DockPanel>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+    </Window.Resources>
+    
+    <Grid x:Name="grid">
+
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="File">
+                    <MenuItem Header="Import" Click="MenuItem_Click_4"/>
+                    <MenuItem Header="Export" Click="MenuItem_Click_5"/>
+                    <Separator/>
+                    <MenuItem Header="Exit" Click="MenuItem_Click"/>
+                </MenuItem>
+                <MenuItem Header="Contact">
+                    <MenuItem Header="Clear" Click="MenuItem_Click_2"/>
+                    <MenuItem Header="Add" Click="MenuItem_Click_1"/>
+                </MenuItem>
+                <MenuItem Header="About" Click="MenuItem_Click_3"/>
+            </Menu>
+
+            <TabControl VerticalAlignment="Stretch">
+                <TabItem Header="List" ScrollViewer.VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch">
+                    <ListBox ItemsSource="{Binding Source={StaticResource ViewSource}}" x:Name="list" ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             AlternationCount="2" 
+                             SelectionChanged="List_SelectionChanged"
+                             Focusable="False"
+                             >
+                    </ListBox>
+                </TabItem>
+
+                <TabItem Header="Grid">
+                    <DataGrid ItemsSource="{Binding People}" x:Name="dataGrid" CanUserAddRows="True">
+                    </DataGrid>
+                </TabItem>
+
+                <TabItem Header="Validation Settings">
+                    <Grid>
+                        <Button Click="Button_Click" Margin="300 230" FontWeight="Bold" Visibility="{Binding Locked, Converter={StaticResource setConverter}, ConverterParameter=b}">
+                            <TextBlock Text="Unlock"/>
+                        </Button>
+                        <Grid HorizontalAlignment="Center">
+                            <Grid.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="5 5"/>
+                                </Style>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="Margin" Value="5 5"/>
+                                    <Setter Property="ItemTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}"/>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="400"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="300"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.ColumnSpan="3" Text="Validation Settings" FontSize="15" Visibility="{Binding Locked, Converter={StaticResource setConverter}, ConverterParameter=a}"
+                                   FontWeight="Bold" TextAlignment="Center" HorizontalAlignment="Center"/>
+                            <Grid Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" Visibility="{Binding Locked, Converter={StaticResource setConverter}, ConverterParameter=a}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock FontWeight="Bold" FontSize="15" Text="Name validation:"/>
+                                <TextBlock Grid.Row="1" FontWeight="Bold" FontSize="15" Text="Surname validation:"/>
+                                <TextBlock Grid.Row="2" FontWeight="Bold" FontSize="15" Text="Email validation:"/>
+                                <TextBlock Grid.Row="3" FontWeight="Bold" FontSize="15" Text="Phone validation:"/>
+
+                                <Button Grid.ColumnSpan="4" Grid.Row="4" Margin="150 2" Click="Button_Click" >
+                                    <TextBlock>Lock</TextBlock>
+                                </Button>
+
+                                <ComboBox Grid.Column="1" Grid.Row="0" Name="NameCombo" ItemsSource="{Binding validations}"/>
+                                <ComboBox Grid.Column="1" Grid.Row="1" Name="SurnameCombo" ItemsSource="{Binding validations}"/>
+                                <ComboBox Grid.Column="1" Grid.Row="2" Name="EmailCombo" ItemsSource="{Binding validations}"/>
+                                <ComboBox Grid.Column="1" Grid.Row="3" Name="PhoneCombo" ItemsSource="{Binding validations}"/>
+
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            
+        </DockPanel>
+
+    </Grid>
+</Window>
